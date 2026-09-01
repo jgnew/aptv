@@ -1,0 +1,22 @@
+name: Sync Upstream
+on:
+  schedule:
+    - cron: '0 */4 * * *'  # 每4小时执行一次，拉取原仓库更新；UTC时间
+  workflow_dispatch: # 允许网页手动点按钮立即执行
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 拉取上游原仓库
+        run: |
+          git remote add upstream https://github.com/Kimentanm/aptv.git
+          git fetch upstream
+          git merge upstream/main main --no-edit || true
+          git push origin main
+          git push origin --tags
